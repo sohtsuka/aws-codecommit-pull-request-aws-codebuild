@@ -101,6 +101,19 @@ Resources:
                   - "logs:*"
                   - "cloudformation:ValidateTemplate"
                   - "codecommit:*"
+                  - "ssm:GetParameters"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "kms:Decrypt"
+                Resource: "arn:aws:kms:*:*:key/alias/aws/ssm"
+              - Effect: "Allow"
+                Action:
+                  - "codebuild:CreateReportGroup"
+                  - "codebuild:CreateReport"
+                  - "codebuild:UpdateReport"
+                  - "codebuild:BatchPutTestCases"
+                  - "codebuild:BatchPutCodeCoverages"
                 Resource: "*"
   LambdaManagedPolicy:
       Type: "AWS::IAM::ManagedPolicy"

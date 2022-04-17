@@ -11,29 +11,13 @@ Parameters:
     Description: The Image you wish to use for CodeBuild.
     Type: String
     AllowedValues:
-      - aws/codebuild/ubuntu-base:14.04
-      - aws/codebuild/android-java-8:26.1.1
-      - aws/codebuild/android-java-8:24.4.1
-      - aws/codebuild/docker:17.09.0
-      - aws/codebuild/golang:1.10
-      - aws/codebuild/java:openjdk-8
-      - aws/codebuild/java:openjdk-9
-      - aws/codebuild/nodejs:10.1.0
-      - aws/codebuild/nodejs:8.11.0
-      - aws/codebuild/nodejs:6.3.1
-      - aws/codebuild/php:5.6
-      - aws/codebuild/php:7.0
-      - aws/codebuild/python:3.6.5
-      - aws/codebuild/python:3.5.2
-      - aws/codebuild/python:3.4.5
-      - aws/codebuild/python:3.3.6
-      - aws/codebuild/python:2.7.12
-      - aws/codebuild/ruby:2.5.1
-      - aws/codebuild/ruby:2.3.1
-      - aws/codebuild/ruby:2.2.5
-      - aws/codebuild/dot-net:core-1
-      - aws/codebuild/dot-net:core-2.0
-      - aws/codebuild/windows-base:1.0
+      - aws/codebuild/amazonlinux2-x86_64-standard:2.0
+      - aws/codebuild/amazonlinux2-x86_64-standard:3.0
+      - aws/codebuild/amazonlinux2-aarch64-standard:1.0
+      - aws/codebuild/amazonlinux2-aarch64-standard:2.0
+      - aws/codebuild/standard:3.0
+      - aws/codebuild/standard:4.0
+      - aws/codebuild/standard:5.0
   ComputeType:
     Description: The Compute Type to use for AWS CodeBuild
     Type: String
@@ -196,7 +180,7 @@ Resources:
       - Name: Email
         DestinationArn: !Ref PipelineSNSTopic
         Branches:
-        - master
+        - main
         Events:
         - all
   CodeBuildProject:
@@ -208,10 +192,15 @@ Resources:
         ComputeType: !Ref ComputeType
         Image: !Ref Image
         Type: LINUX_CONTAINER
+        PrivilegedMode: true
       Name: !Sub "${ProjectName}"
       ServiceRole: !ImportValue CodeBuildRoleArn
       Source:
         Type: CODEPIPELINE
+      Cache:
+        Type: LOCAL
+        Modes: # You can specify one or more cache mode,
+          - LOCAL_DOCKER_LAYER_CACHE
   CodeBuildProjectPR:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -246,7 +235,7 @@ Resources:
               OutputArtifacts:
                 - Name: "TemplateSource"
               Configuration:
-                BranchName: "master"
+                BranchName: "main"
                 RepositoryName: !Ref ProjectName
               RunOrder: 1
         - Name: Build
